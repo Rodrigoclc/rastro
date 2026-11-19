@@ -1,0 +1,82 @@
+# Porteiro da stack: autentica, protege e repassa a telemetria para o LGTM.
+
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+
+  # Um token por ambiente. As apps enviam "Authorization: Bearer <token>".
+  bearertokenauth:
+    tokens:
+      - ${env:OTEL_TOKEN_PRODUCTION}
+      - ${env:OTEL_TOKEN_STAGING}
+
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+        auth:
+          authenticator: bearertokenauth
+
+processors:
+  # Recusa novos lotes antes de o container estourar memória.
+  # As apps tentam de novo depois, sem perder nada que esteja na fila delas.
+  memory_limiter:
+    check_interval: 1s
+    limit_percentage: 80
+    spike_limit_percentage: 20
+
+  # Dado sem nome de serviço não tem dono: descarta.
+  filter/sem_servico:
+    error_mode: ignore
+    traces:
+      span:
+        - resource.attributes["service.name"] == nil
+        - IsMatch(resource.attributes["service.name"], "^unknown_service")
+    metrics:
+      metric:
+        - resource.attributes["service.name"] == nil
+        - IsMatch(resource.attributes["service.name"], "^unknown_service")
+    logs:
+      log_record:
+        - resource.attributes["service.name"] == nil
+        - IsMatch(resource.attributes["service.name"], "^unknown_service")
+
+  # Defesa em profundidade: mesmo que uma app capture headers sensíveis,
+  # eles não chegam ao armazenamento.
+  transform/sensivel:
+    error_mode: ignore
+    trace_statements:
+      - context: span
+        statements:
+          - delete_key(attributes, "http.request.header.authorization")
+          - delete_key(attributes, "http.request.header.cookie")
+          - delete_key(attributes, "http.response.header.set-cookie")
+
+  batch:
+    send_batch_size: 8192
+    timeout: 5s
+
+exporters:
+  # O LGTM tem um collector interno que separa traces, logs e métricas
+  # para Tempo, Loki e Prometheus.
+  otlp_http/lgtm:
+    endpoint: http://lgtm:4318
+    tls:
+      insecure: true
+
+service:
+  extensions: [health_check, bearertokenauth]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, filter/sem_servico, transform/sensivel, batch]
+      exporters: [otlp_http/lgtm]
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, filter/sem_servico, batch]
+      exporters: [otlp_http/lgtm]
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, filter/sem_servico, batch]
+      exporters: [otlp_http/lgtm]

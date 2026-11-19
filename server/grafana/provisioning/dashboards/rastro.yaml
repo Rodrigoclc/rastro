@@ -1,0 +1,10 @@
+apiVersion: 1
+
+providers:
+  - name: rastro
+    folder: Rastro
+    type: file
+    allowUiUpdates: false
+    options:
+      path: /otel-lgtm/rastro-dashboards
+      foldersFromFilesStructure: false

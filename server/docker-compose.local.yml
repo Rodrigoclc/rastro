@@ -1,0 +1,19 @@
+# Ambiente local para testar a stack na sua máquina, sem domínio nem TLS.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.local.yml up -d
+#
+# Collector em http://localhost:4318 e Grafana em http://localhost:3000.
+
+services:
+  caddy:
+    profiles: ["disabled"]
+
+  collector:
+    ports:
+      - "127.0.0.1:4318:4318"
+
+  lgtm:
+    environment:
+      GF_SERVER_ROOT_URL: http://localhost:3000
+    ports:
+      - "127.0.0.1:3000:3000"

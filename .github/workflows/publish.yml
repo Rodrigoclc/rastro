@@ -1,0 +1,32 @@
+name: Publicar no npm
+
+# Crie a tag v<versão> (ex.: v0.2.0) igual à versão de packages/rastro/package.json.
+# Precisa do segredo NPM_TOKEN no repositório (token de automação do npm).
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+  id-token: write # proveniência do pacote no npm
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - run: pnpm install --frozen-lockfile
+      - name: Tag confere com a versão
+        working-directory: packages/rastro
+        run: test "v$(node -p "require('./package.json').version")" = "$GITHUB_REF_NAME"
+      - run: pnpm test
+      - working-directory: packages/rastro
+        run: cp ../../LICENSE . && npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

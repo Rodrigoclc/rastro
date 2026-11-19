@@ -1,0 +1,69 @@
+name: otel-platform
+
+# Stack central de observabilidade do Rastro.
+#
+#   apps ──HTTPS──▶ caddy ──▶ collector ──▶ lgtm (Tempo, Loki, Prometheus, Grafana)
+#   equipe ─HTTPS─▶ caddy ──────────────────▶ lgtm:3000 (Grafana)
+#
+# Só o Caddy expõe portas. Collector e LGTM ficam na rede interna.
+
+services:
+  caddy:
+    image: caddy:2.11-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      OTEL_DOMAIN: ${OTEL_DOMAIN:?defina OTEL_DOMAIN no .env}
+      GRAFANA_DOMAIN: ${GRAFANA_DOMAIN:?defina GRAFANA_DOMAIN no .env}
+      ACME_EMAIL: ${ACME_EMAIL:?defina ACME_EMAIL no .env}
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - collector
+      - lgtm
+
+  collector:
+    image: otel/opentelemetry-collector-contrib:0.165.0
+    restart: unless-stopped
+    command: ["--config=/etc/otelcol/config.yaml"]
+    environment:
+      OTEL_TOKEN_PRODUCTION: ${OTEL_TOKEN_PRODUCTION:?defina OTEL_TOKEN_PRODUCTION no .env}
+      OTEL_TOKEN_STAGING: ${OTEL_TOKEN_STAGING:?defina OTEL_TOKEN_STAGING no .env}
+    volumes:
+      - ./collector/config.yaml:/etc/otelcol/config.yaml:ro
+    depends_on:
+      - lgtm
+
+  lgtm:
+    image: grafana/otel-lgtm:0.40.0
+    restart: unless-stopped
+    environment:
+      # A imagem vem com acesso anônimo como Admin. Nunca deixar ligado.
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      # Só vale na primeira subida (quando o banco do Grafana é criado).
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?defina GRAFANA_ADMIN_PASSWORD no .env}
+      GF_SERVER_ROOT_URL: https://${GRAFANA_DOMAIN}
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      # Retenção de métricas.
+      PROMETHEUS_EXTRA_ARGS: --storage.tsdb.retention.time=${METRICS_RETENTION:-30d}
+    volumes:
+      - lgtm_data:/data
+      # Retenção de traces (7 dias) e logs (15 dias).
+      - ./lgtm/tempo-config.yaml:/otel-lgtm/tempo-config.yaml:ro
+      - ./lgtm/loki-config.yaml:/otel-lgtm/loki-config.yaml:ro
+      # Dashboards e alertas versionados neste repositório.
+      - ./grafana/provisioning/dashboards/rastro.yaml:/otel-lgtm/grafana/conf/provisioning/dashboards/rastro.yaml:ro
+      - ./grafana/provisioning/alerting/rastro.yaml:/otel-lgtm/grafana/conf/provisioning/alerting/rastro.yaml:ro
+      - ./grafana/dashboards:/otel-lgtm/rastro-dashboards:ro
+
+volumes:
+  caddy_data:
+  caddy_config:
+  lgtm_data:

@@ -1,0 +1,16 @@
+{
+	email {$ACME_EMAIL}
+}
+
+# Recebe a telemetria das aplicações (OTLP/HTTP).
+{$OTEL_DOMAIN} {
+	request_body {
+		max_size 16MB
+	}
+	reverse_proxy collector:4318
+}
+
+# Interface do Grafana.
+{$GRAFANA_DOMAIN} {
+	reverse_proxy lgtm:3000
+}
