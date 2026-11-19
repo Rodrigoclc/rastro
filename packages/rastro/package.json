@@ -51,7 +51,8 @@
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc --noEmit",
-    "test": "pnpm run build && node --test test/*.test.mjs"
+    "test": "pnpm run build && node --test test/*.test.mjs",
+    "prepublishOnly": "tsup"
   },
   "engines": {
     "node": ">=20.6.0"
