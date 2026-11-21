@@ -13,7 +13,7 @@ Requer Node 20.6 ou superior.
 ## 1. Instalar
 
 ```bash
-pnpm add rastro   # ou npm install rastro / yarn add rastro
+pnpm add @rodrigoclc/rastro   # ou npm install @rodrigoclc/rastro / yarn add @rodrigoclc/rastro
 ```
 
 ## 2. Configurar o ambiente
@@ -45,18 +45,18 @@ A biblioteca precisa ser carregada antes do Adonis e dos drivers de banco. No `e
 
 ```js
 // Adonis 6 e 7 (ESM)
-node_args: '--import rastro/register',
+node_args: '--import @rodrigoclc/rastro/register',
 
 // Adonis 5 (CommonJS)
-node_args: '-r rastro/register',
+node_args: '-r @rodrigoclc/rastro/register',
 ```
 
-Sem PM2, a mesma flag vai na linha de comando: `node --import rastro/register build/bin/server.js`.
+Sem PM2, a mesma flag vai na linha de comando: `node --import @rodrigoclc/rastro/register build/bin/server.js`.
 
 Alternativa sem mexer no PM2, para Adonis 6 e 7: coloque como primeira linha de `bin/server.ts`:
 
 ```ts
-await import('rastro/register')
+await import('@rodrigoclc/rastro/register')
 ```
 
 Pronto. Traces, logs e métricas já estão sendo enviados.
@@ -69,7 +69,7 @@ Sem o middleware, os spans se chamam só `GET` e as métricas não separam por r
 
 ```ts
 router.use([
-  () => import('rastro/adonis'),
+  () => import('@rodrigoclc/rastro/adonis'),
   // ...demais middlewares
 ])
 ```
@@ -78,7 +78,7 @@ router.use([
 
 ```ts
 Server.middleware.register([
-  () => import('rastro/adonis'),
+  () => import('@rodrigoclc/rastro/adonis'),
   // ...demais middlewares
 ])
 ```
@@ -87,7 +87,7 @@ O middleware também grava `enduser.id` com o id do usuário autenticado. Para a
 
 ```ts
 // app/middleware/otel_middleware.ts
-import { createOtelMiddleware } from 'rastro/adonis'
+import { createOtelMiddleware } from '@rodrigoclc/rastro/adonis'
 
 export default createOtelMiddleware({
   attributes: (ctx) => ({ 'organization.id': String(ctx.organization?.id ?? '') }),

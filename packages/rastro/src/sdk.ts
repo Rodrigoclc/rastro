@@ -40,7 +40,7 @@ const noop: RastroHandle['shutdown'] = async () => {}
  * Inicializa o OpenTelemetry. É idempotente: chamar duas vezes devolve a
  * mesma instância. Precisa rodar antes de o framework e os drivers de banco
  * serem importados, por isso o caminho recomendado é `--import`/`-r` do
- * `rastro/register`.
+ * `@rodrigoclc/rastro/register`.
  */
 export function startOtel(options: StartOtelOptions = {}): RastroHandle {
   const globalRef = globalThis as GlobalWithOtel

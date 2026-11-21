@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { resolveConfig, isIgnoredPath, DEFAULT_IGNORED_ROUTES } from 'rastro'
+import { resolveConfig, isIgnoredPath, DEFAULT_IGNORED_ROUTES } from '@rodrigoclc/rastro'
 
 test('ambiente vem de RASTRO_ENVIRONMENT, OTEL_RESOURCE_ATTRIBUTES ou NODE_ENV', () => {
   assert.equal(resolveConfig({ RASTRO_ENVIRONMENT: 'production', NODE_ENV: 'x' }).environment, 'production')

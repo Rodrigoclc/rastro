@@ -3,7 +3,7 @@ name: Publicar no npm
 # Crie a tag v<versão> (ex.: v0.2.0) igual à versão de packages/rastro/package.json.
 #
 # Sem token: o npm confia neste workflow por trusted publishing (OIDC). A configuração
-# fica no npmjs.com, em rastro > Settings > Trusted Publisher (Rodrigoclc/rastro, publish.yml).
+# fica no npmjs.com, em @rodrigoclc/rastro > Settings > Trusted Publisher (Rodrigoclc/rastro, publish.yml).
 on:
   push:
     tags: ["v*"]

@@ -1,7 +1,7 @@
-// Simula uma API Adonis 5 (CommonJS) carregada com -r rastro/register
+// Simula uma API Adonis 5 (CommonJS) carregada com -r @rodrigoclc/rastro/register
 const http = require("node:http")
 const pino = require('pino')
-const { createOtelMiddleware } = require('rastro/adonis')
+const { createOtelMiddleware } = require('@rodrigoclc/rastro/adonis')
 
 const logger = pino()
 const Middleware = createOtelMiddleware({ attributes: () => ({ 'organization.id': '7' }) })

@@ -1,7 +1,7 @@
-// Simula uma API Adonis 6/7 (ESM) carregada com --import rastro/register
+// Simula uma API Adonis 6/7 (ESM) carregada com --import @rodrigoclc/rastro/register
 import http from 'node:http'
 import pino from 'pino'
-import { createOtelMiddleware } from 'rastro/adonis'
+import { createOtelMiddleware } from '@rodrigoclc/rastro/adonis'
 
 const logger = pino()
 const Middleware = createOtelMiddleware({ attributes: () => ({ 'organization.id': '7' }) })

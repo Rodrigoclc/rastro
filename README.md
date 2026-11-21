@@ -6,7 +6,7 @@ O repositório tem duas partes que evoluem juntas:
 
 | Pasta | O que é | Onde roda |
 |---|---|---|
-| [`packages/rastro`](packages/rastro) | Biblioteca `rastro`, que instrumenta APIs AdonisJS 5, 6 e 7 com OpenTelemetry | Em cada aplicação |
+| [`packages/rastro`](packages/rastro) | Biblioteca `@rodrigoclc/rastro`, que instrumenta APIs AdonisJS 5, 6 e 7 com OpenTelemetry | Em cada aplicação |
 | [`server`](server) | Stack central: Caddy, OpenTelemetry Collector e Grafana LGTM, com dashboard e alertas prontos | Num servidor seu |
 
 ```

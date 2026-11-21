@@ -61,8 +61,8 @@ const metricNames = (received) =>
   )
 
 for (const [label, args] of [
-  ['ESM (Adonis 6/7)', ['--import', 'rastro/register', 'app.mjs']],
-  ['CommonJS (Adonis 5)', ['-r', 'rastro/register', 'app.cjs']],
+  ['ESM (Adonis 6/7)', ['--import', '@rodrigoclc/rastro/register', 'app.mjs']],
+  ['CommonJS (Adonis 5)', ['-r', '@rodrigoclc/rastro/register', 'app.cjs']],
 ]) {
   test(`${label}: envia traces, logs e métricas com rota e ambiente`, async () => {
     const { server, received, port } = await startCollector()
@@ -123,7 +123,7 @@ for (const [label, args] of [
 test('OTEL_SDK_DISABLED desliga tudo sem quebrar a app', async () => {
   const { server, received, port } = await startCollector()
   try {
-    const result = await runApp(['--import', 'rastro/register', 'app.mjs'], {
+    const result = await runApp(['--import', '@rodrigoclc/rastro/register', 'app.mjs'], {
       OTEL_SERVICE_NAME: 'smoke-api',
       OTEL_EXPORTER_OTLP_ENDPOINT: `http://127.0.0.1:${port}`,
       OTEL_SDK_DISABLED: 'true',
@@ -136,7 +136,7 @@ test('OTEL_SDK_DISABLED desliga tudo sem quebrar a app', async () => {
 })
 
 test('sem OTEL_SERVICE_NAME a telemetria desliga com aviso', async () => {
-  const result = await runApp(['--import', 'rastro/register', 'app.mjs'], {
+  const result = await runApp(['--import', '@rodrigoclc/rastro/register', 'app.mjs'], {
     OTEL_SERVICE_NAME: '',
     OTEL_EXPORTER_OTLP_ENDPOINT: 'http://127.0.0.1:9',
   })
@@ -146,7 +146,7 @@ test('sem OTEL_SERVICE_NAME a telemetria desliga com aviso', async () => {
 
 test('coletor fora do ar não derruba nem trava a app', async () => {
   const started = Date.now()
-  const result = await runApp(['--import', 'rastro/register', 'app.mjs'], {
+  const result = await runApp(['--import', '@rodrigoclc/rastro/register', 'app.mjs'], {
     OTEL_SERVICE_NAME: 'smoke-api',
     OTEL_EXPORTER_OTLP_ENDPOINT: 'http://127.0.0.1:9',
   })
