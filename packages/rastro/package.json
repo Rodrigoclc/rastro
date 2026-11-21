@@ -1,6 +1,6 @@
 {
   "name": "@rodrigoclc/rastro",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Observabilidade OpenTelemetry pronta para APIs AdonisJS 5, 6 e 7: traces, logs e métricas com uma linha no PM2.",
   "license": "MIT",
   "author": "Rodrigo Castro (https://orodrigodev.com.br)",
@@ -30,16 +30,34 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./register": {
-      "import": "./dist/register.js",
-      "require": "./dist/register.cjs"
+      "import": {
+        "types": "./dist/register.d.ts",
+        "default": "./dist/register.js"
+      },
+      "require": {
+        "types": "./dist/register.d.cts",
+        "default": "./dist/register.cjs"
+      }
     },
     "./adonis": {
-      "import": "./dist/adonis.js",
-      "require": "./dist/adonis.cjs"
+      "import": {
+        "types": "./dist/adonis.d.ts",
+        "default": "./dist/adonis.js"
+      },
+      "require": {
+        "types": "./dist/adonis.d.cts",
+        "default": "./dist/adonis.cjs"
+      }
     },
     "./package.json": "./package.json"
   },

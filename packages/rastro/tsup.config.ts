@@ -23,6 +23,7 @@ export default defineConfig([
   {
     ...shared,
     format: 'cjs',
+    dts: true, // gera os .d.cts: sem eles, quem usa require (Adonis 5) fica sem tipos
     define: { __ESM_BUILD__: 'false', __LIBRARY_VERSION__: JSON.stringify(version) },
   },
 ])

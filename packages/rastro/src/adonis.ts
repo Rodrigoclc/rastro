@@ -4,12 +4,13 @@ import { getRPCMetadata, RPCType } from '@opentelemetry/core'
 /**
  * Formato mínimo do HttpContext comum ao AdonisJS 5, 6 e 7.
  * Evita depender dos tipos de uma versão específica do framework.
+ * Sem index signature: o `HttpContext` real (uma classe) precisa caber aqui,
+ * como em `createOtelMiddleware<HttpContext>()`.
  */
 export interface AdonisLikeContext {
   request: { method(): string }
   route?: { pattern?: string } | null
   auth?: { user?: { id?: unknown } | null } | null
-  [key: string]: unknown
 }
 
 export interface OtelMiddlewareOptions<Ctx extends AdonisLikeContext = AdonisLikeContext> {

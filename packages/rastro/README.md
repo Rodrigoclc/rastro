@@ -16,6 +16,13 @@ Requer Node 20.6 ou superior.
 pnpm add @rodrigoclc/rastro   # ou npm install @rodrigoclc/rastro / yarn add @rodrigoclc/rastro
 ```
 
+No pnpm 10, a instalação avisa que o script de build do `protobufjs` foi ignorado. Pode ignorar: o script só confere a versão. Para o aviso sumir, adicione ao `pnpm-workspace.yaml`:
+
+```yaml
+ignoredBuiltDependencies:
+  - protobufjs
+```
+
 ## 2. Configurar o ambiente
 
 No `.env` da aplicação:
@@ -87,9 +94,11 @@ O middleware também grava `enduser.id` com o id do usuário autenticado. Para a
 
 ```ts
 // app/middleware/otel_middleware.ts
+import type { HttpContext } from '@adonisjs/core/http'
 import { createOtelMiddleware } from '@rodrigoclc/rastro/adonis'
 
-export default createOtelMiddleware({
+export default createOtelMiddleware<HttpContext>({
+  // ctx.organization: exemplo de propriedade que a aplicação adiciona ao HttpContext
   attributes: (ctx) => ({ 'organization.id': String(ctx.organization?.id ?? '') }),
 })
 ```
